@@ -4,7 +4,8 @@
 
 TEMPLATE = app
 TARGET = GreenJ
-QT += core gui webkit network
+QT += core network multimedia widgets webenginewidgets
+#QT += webkitwidgets
 win32 {
 	DESTDIR = ../bin/win32
 	LIBDIR = ../lib/win32
@@ -15,21 +16,12 @@ win32 {
 }
 unix {
 	DESTDIR = ../bin/linux
-	LIBDIR = ../lib/linux
 	BUILDDIR = ../build/linux
-	PJSIP_DIR = ../lib/linux/pjsip
-	PJSIP_TARGET = i686-pc-linux-gnu
+        PJSIP_DIR = /home/anzye/Workspace/3rdparty/audio_video/pjproject/out
+        LIBDIR = $$PJSIP_DIR/lib
+        PJSIP_TARGET = x86_64-linux-gnu
 }
-unix:!mac {
-	QT += phonon
-}
-mac {
-	DESTDIR = ../bin/mac
-	LIBDIR = ../lib/mac
-	BUILDDIR = ../build/mac
-	PJSIP_DIR = ../lib/mac
-	PJSIP_TARGET = i386-apple-darwin11.3.0
-}
+
 SOURCEDIR = ../src
 VENDORDIR = ../vendor
 RESOURCEDIR = ../res
@@ -44,53 +36,38 @@ INCLUDEPATH += $$SOURCEDIR/GeneratedFiles \
     $$SOURCEDIR/GeneratedFiles/Debug \
     $$SOURCEDIR \
     $$VENDORDIR/qt-json \
-    $$PJSIP_DIR \
-	$$PJSIP_DIR/pjmedia/include \
-    $$PJSIP_DIR/pjsip/include \
-    $$PJSIP_DIR/pjnath/include \
-    $$PJSIP_DIR/pjmedia/include/pjmedia-codec \
-    $$PJSIP_DIR/pjmedia/include/pjmedia-audiodev \
-    $$PJSIP_DIR/pjmedia/include/pjmedia \
-    $$PJSIP_DIR/pjlib-util/include \
-    $$PJSIP_DIR/pjlib/include
-unix: INCLUDEPATH += /usr/include/
+    $$PJSIP_DIR/include \
 
-LIBS += -L/usr/lib/ \
-	-L$$LIBDIR/ \
-	-L$$PJSIP_DIR/third_party/lib \
-	-L$$PJSIP_DIR/pjsip/lib \
-	-L$$PJSIP_DIR/pjnath/lib \
-	-L$$PJSIP_DIR/pjmedia/lib \
-	-L$$PJSIP_DIR/pjlib-util/lib \
-	-L$$PJSIP_DIR/pjlib/lib \
+LIBS +=  -L$$LIBDIR/
 	
-unix: LIBS += -L/usr/lib/ \
-	-lpjsua-$$PJSIP_TARGET \
-	-lpjsip-ua-$$PJSIP_TARGET \
-	-lpjsip-simple-$$PJSIP_TARGET \
-	-lpjsip-$$PJSIP_TARGET \
-	-lpjmedia-codec-$$PJSIP_TARGET \
-	-lpjmedia-$$PJSIP_TARGET \
-	-lpjmedia-audiodev-$$PJSIP_TARGET \
-	-lpjnath-$$PJSIP_TARGET \
-	-lpjlib-util-$$PJSIP_TARGET \
-	-lresample-$$PJSIP_TARGET \
-	-lmilenage-$$PJSIP_TARGET \
-	-lsrtp-$$PJSIP_TARGET \
-	-lgsmcodec-$$PJSIP_TARGET \
-	-lspeex-$$PJSIP_TARGET \
-	-lilbccodec-$$PJSIP_TARGET \
-	-lg7221codec-$$PJSIP_TARGET \
-	-lportaudio-$$PJSIP_TARGET  \
-	-lpj-$$PJSIP_TARGET \
+unix: LIBS +=  \
+        -lpjsua \
+        -lpjsip-ua \
+        -lpjsip-simple \
+        -lpjsip \
+        -lwebrtc \
+        -lpjmedia-codec \
+        -lpjmedia \
+        -lpjmedia-audiodev \
+        -lpjnath \
+        -lpjlib-util \
+        -lresample \
+        -lsrtp \
+        -lgsmcodec \
+        -lspeex \
+        -lilbccodec \
+        -lg7221codec \
+        -lpj \
 	-lm \
 	-lpthread \
-	-lasound \
 	-lssl \
-	#-luuid \
+#	-lasound \
+#        -lmilenage \
+#        -lportaudio  \
+        #-luuid \
 	#-lcrypto \
 
-unix:!mac LIBS += -lnsl -lrt -lasound
+unix:!mac: LIBS += -lnsl -lrt
 
 win32: LIBS += -lIphlpapi \
     -ldsound \

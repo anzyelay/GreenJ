@@ -13,7 +13,7 @@
 #define PRINTHANDLER_INCLUDE_H
 
 #include <QObject>
-#include <QWebView>
+#include <QWebEngineView>
 #include <QUrl>
 
 class Gui;
@@ -47,7 +47,7 @@ private slots:
 
 private:
     Gui &gui_;
-    QWebView print_page_;
+    QWebEngineView print_page_;
 };
 
 #endif // PRINTHANDLER_INCLUDE_H

@@ -9,11 +9,12 @@
 **
 ****************************************************************************/
 
-#include <QtGui/QApplication>
+#include <QApplication>
 #include "Config.h"
 #include "phone/Phone.h"
 #include "phone/api/Sip.h"
 #include "Gui.h"
+#include <QMessageBox>
 
 //-----------------------------------------------------------------------------
 int main(int argc, char *argv[])

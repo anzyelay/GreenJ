@@ -239,9 +239,9 @@ void Sip::getAccountInfo(QVariantMap &account_info)
     pjsua_acc_info ai;
     pjsua_acc_get_info(account_id_, &ai);
 
-    account_info.insert("address", Qt::escape(ai.acc_uri.ptr));
-    account_info.insert("status", Qt::escape(ai.status_text.ptr));
-    account_info.insert("online_status", Qt::escape(ai.online_status_text.ptr));
+    account_info.insert("address", QString(ai.acc_uri.ptr).toHtmlEscaped());
+    account_info.insert("status", QString(ai.status_text.ptr).toHtmlEscaped());
+    account_info.insert("online_status", QString(ai.online_status_text.ptr).toHtmlEscaped());
 }
 
 //-----------------------------------------------------------------------------
@@ -534,11 +534,11 @@ void Sip::getCallInfo(const int call_id, QVariantMap &call_info)
     pjsua_call_info ci;
     pjsua_call_get_info(call_id, &ci);
 
-    call_info.insert("address", Qt::escape(ci.remote_contact.ptr));
-    call_info.insert("number", Qt::escape(ci.remote_info.ptr));
-    call_info.insert("stateText", Qt::escape(ci.state_text.ptr));
+    call_info.insert("address",     QString(ci.remote_contact.ptr).toHtmlEscaped());
+    call_info.insert("number",      QString(ci.remote_info.ptr).toHtmlEscaped());
+    call_info.insert("stateText",   QString(ci.state_text.ptr).toHtmlEscaped());
+    call_info.insert("lastStatus",  QString(ci.last_status_text.ptr).toHtmlEscaped());
     call_info.insert("state", (int)ci.state);
-    call_info.insert("lastStatus", Qt::escape(ci.last_status_text.ptr));
     call_info.insert("duration", (int)ci.connect_duration.sec);
 }
 

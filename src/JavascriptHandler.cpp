@@ -9,7 +9,7 @@
 **
 ****************************************************************************/
 
-#include <QWebFrame>
+#include <QWebEnginePage>
 #include <QString>
 #include "phone/Account.h"
 #include "phone/Call.h"
@@ -22,12 +22,11 @@
 using phone::Phone;
 using phone::Call;
 using phone::Account;
-using QtJson::Json;
 
 const QString JavascriptHandler::OBJECT_NAME = "qt_handler";
 
 //-----------------------------------------------------------------------------
-JavascriptHandler::JavascriptHandler(QWebView *web_view, Phone &phone) :
+JavascriptHandler::JavascriptHandler(QWebEngineView *web_view, Phone &phone) :
     web_view_(web_view), phone_(phone), js_callback_handler_("")
 {
 }
@@ -53,7 +52,7 @@ void JavascriptHandler::incomingCall(const Call &call) const
     evaluateJavaScript("incomingCall(" + QString::number(call.getId()) + ",'" 
                                        + call.getUrl() + "','" 
                                        + call.getName() + "',"
-                                       + Json::serialize(call.getHeaders()) + ")");
+                                       + QtJson::serializeStr(call.getHeaders()) + ")");
 }
 
 //-----------------------------------------------------------------------------
@@ -102,10 +101,12 @@ void JavascriptHandler::microphoneLevel(int level) const
 //-----------------------------------------------------------------------------
 QVariant JavascriptHandler::evaluateJavaScript(const QString &code) const
 {
+    QWebEnginePage * page = web_view_->page();
     if (js_callback_handler_.isEmpty()) {
-        return web_view_->page()->mainFrame()->evaluateJavaScript(code);
+        page->runJavaScript(code, [](const QVariant &result){ return result; });
     }
-    return web_view_->page()->mainFrame()->evaluateJavaScript(js_callback_handler_ + "." + code);
+    page->runJavaScript(js_callback_handler_ + "." + code, [](const QVariant &result){ return result; });
+    return QVariant();
 }
 
 //-----------------------------------------------------------------------------
@@ -510,5 +511,5 @@ void JavascriptHandler::slotLogMessage(const LogInfo &info) const
     map["domain"] = info.domain_;
     map["code"] = QString::number(info.code_);
     map["message"] = info.msg_;
-    evaluateJavaScript("logMessage(" + Json::serialize(map) + ")");
+    evaluateJavaScript("logMessage(" + QtJson::serializeStr(map) + ")");
 }

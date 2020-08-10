@@ -12,15 +12,14 @@
 #ifndef WEBPAGE_INCLUDE_H
 #define WEBPAGE_INCLUDE_H
 
-#include <QWebPage>
-#include <QWebHistory>
+#include <QWebEnginePage>
 #include <QString>
 #include <QUrl>
 
 /**
  * Overloads Qts WebPage class to manipulate user agent etc.
  */
-class WebPage : public QWebPage
+class WebPage : public QWebEnginePage
 {
     /**
      * Set a default user-agent to the browser

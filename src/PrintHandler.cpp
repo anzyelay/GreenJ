@@ -10,6 +10,9 @@
 ****************************************************************************/
 
 #include <QPrinter>
+#include <QWebEnginePage>
+#include <QWebEngineProfile>
+#include <QWebEngineCookieStore>
 #include <QPrintPreviewDialog>
 #include "Gui.h"
 #include "PrintHandler.h"
@@ -24,9 +27,6 @@ PrintHandler::PrintHandler(Gui &gui) : gui_(gui)
 //-----------------------------------------------------------------------------
 void PrintHandler::loadPrintPage(const QUrl &url)
 {
-    QNetworkCookieJar *cookie = gui_.getWindow().webview->page()->networkAccessManager()->cookieJar();
-
-    print_page_.page()->networkAccessManager()->setCookieJar(cookie);
     print_page_.load(url);
 }
 

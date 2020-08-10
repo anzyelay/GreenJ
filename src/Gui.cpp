@@ -10,8 +10,9 @@
 ****************************************************************************/
 
 #include <QApplication>
-#include <QWebFrame>
-#include <QWebInspector>
+#include <QWebEngineView>
+#include <QWebEngineSettings>
+#include <QWebChannel>
 #include "Config.h"
 #include "LogHandler.h"
 #include "phone/Phone.h"
@@ -19,7 +20,7 @@
 #include "Gui.h"
 
 //-----------------------------------------------------------------------------
-Gui::Gui(phone::Phone &phone, QWidget *parent, Qt::WFlags flags) :
+Gui::Gui(phone::Phone &phone, QWidget *parent, Qt::WindowFlags flags) :
     QMainWindow(parent, flags),
     phone_(phone),
     print_handler_(*this)
@@ -33,20 +34,20 @@ Gui::Gui(phone::Phone &phone, QWidget *parent, Qt::WFlags flags) :
     ui_.webview->setPage(new WebPage());
     //ui_.webview->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 
-    ui_.webview->settings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
-    ui_.webview->settings()->setLocalStoragePath(QDir::homePath() + "/.greenj/");
+    ui_.webview->settings()->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
+//    ui_.webview->settings()->setLocalStoragePath(QDir::homePath() + "/.greenj/");
+
 
 #ifdef DEBUG
     // Enable webkit Debugger
-    ui_.webview->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
 #else
     // Deactivate right-click context menu
     ui_.webview->setContextMenuPolicy(Qt::NoContextMenu);
 #endif
 
-    connect(ui_.webview->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), 
+    connect(ui_.webview->page(), SIGNAL(loadStarted()),
             this,                             SLOT(slotCreateJavascriptWindowObject()));
-    connect(ui_.webview,                      SIGNAL(linkClicked(const QUrl&)), 
+    connect(ui_.webview,                      SIGNAL(urlChanged(QUrl)),
             this,                             SLOT(slotLinkClicked(const QUrl&)));
 
     connect(&LogHandler::getInstance(), SIGNAL(signalLogMessage(const LogInfo&)),
@@ -56,7 +57,7 @@ Gui::Gui(phone::Phone &phone, QWidget *parent, Qt::WFlags flags) :
     connect(js_handler_, SIGNAL(signalPrintPage(const QUrl&)),
             this,        SLOT(slotPrintPage(const QUrl&)));
 
-    connect(&phone_, SIGNAL(signalIncomingCall(const QString&)),
+    connect(&phone_, SIGNAL(signalIncomingCall(QString,QVariantMap)),
             this,    SLOT(slotIncomingCall(const QString&)));
 
     QUrl url(Config::getInstance().getBrowserUrl());
@@ -136,8 +137,9 @@ void Gui::slotPrintPage(const QUrl &url)
 //-----------------------------------------------------------------------------
 void Gui::slotCreateJavascriptWindowObject()
 {
-    ui_.webview->page()->mainFrame()
-        ->addToJavaScriptWindowObject(JavascriptHandler::OBJECT_NAME, js_handler_);
+    QWebChannel *channel = new QWebChannel(this);
+    channel->registerObject(JavascriptHandler::OBJECT_NAME, js_handler_);
+    ui_.webview->page()->setWebChannel(channel);
 }
 
 //-----------------------------------------------------------------------------
